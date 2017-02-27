@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+    <script src="Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var ulUsers = $('#ulUsers');
+
+            $('#btn').click(function () {
+                var username = $('#txtUsername').val();
+                var password = $('#txtPassword').val();
+
+                $.ajax({
+                    type: 'GET',
+                    url: 'api/users',
+                    dataType: 'json',
+                    headers: {
+                        'Authorization' : 'Basic ' + btoa(username + ":" + password)
+                    },
+                    success: function (data) {
+                        ulUsers.empty();
+                        $.each(data, function (index, val) {
+                            var fullName = val.UserName + ' ' + val.Password;
+                            ulUsers.append('<li>' + fullName + '</li>')
+                        });
+                    },
+                    complete: function (jqXHR) {
+                        if (jqXHR.status == '401') {
+                            ulUsers.empty();
+                            ulUsers.append('<li>' + jqXHR.status + ' : ' + jqXHR.statusText + '</li>');
+                        }
+                    }
+                })
+            })
+
+            $('#btnClear').click(function () {
+                ulUsers.empty();
+            })
+        })
+    </script>
+</head>
+<body>
+    Username: <input type="text" id="txtUsername" />
+    Password: <input type="password" id="txtPassword" />
+    </br> </br>
+    <input id="btn" type="button" value="Authenticate and get users" />
+    <input id="btnClear" type="button" value="Clear" />
+    <ul id="ulUsers"></ul>
+</body>
+</html>
